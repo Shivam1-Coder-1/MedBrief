@@ -17,7 +17,7 @@ const Smart_help = () => {
         setLoading(true);
 
         try {
-            const res = await fetch(`${API_BASE_URL}/Smart_Help/`, {
+            const res = await fetch(`${API_BASE_URL}/smart_help/`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${accessToken}`,
