@@ -179,31 +179,71 @@ def Status_view(request):
         return Response({"success": True, "profile_completed": status_obj.profile_completed})
     return Response({"success": True, "profile_completed": status_obj.profile_completed})
 
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def Smart_Help(request):
+    print("USER:", request.user)
+    print("DATA:", request.data)
+
     know = request.data.get("know")
+
+    logger.info(f"Incoming request - know: {know}, data: {request.data}")
+
     try:
         if know == "workout":
             level = request.data.get("workout_level")
+            exercise_type = request.data.get("exercise_type")
+
             if not level:
-                return Response({"success": False, "msg": "Level and Type are required"}, status=status.HTTP_400_BAD_REQUEST)
-            result = func_workout(level)
+                return Response(
+                    {"success": False, "msg": "workout_level is required"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            result = func_workout(level, exercise_type)
+
         elif know == "diet":
             bmi = request.data.get("bmi")
-            if bmi is None:
-                return Response({"success": False, "msg": "BMI is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+            if bmi in [None, ""]:
+                return Response(
+                    {"success": False, "msg": "BMI is required"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             result = diet_by_bmi(float(bmi))
+
         else:
-            return Response({"success": False, "msg": "Invalid service category"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"success": False, "msg": "Invalid service category"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         if not result.get("success"):
             return Response(result, status=status.HTTP_502_BAD_GATEWAY)
-        return Response({"success": True, "type": know, "data": result.get("data")})
+
+        return Response(
+            {"success": True, "type": know, "data": result.get("data")},
+            status=status.HTTP_200_OK
+        )
+
     except (ValueError, TypeError):
-        return Response({"success": False, "msg": "Invalid data types provided"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"success": False, "msg": "Invalid input type"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
     except Exception as e:
         logger.critical(f"UNHANDLED VIEW ERROR: {str(e)}")
-        return Response({"success": False, "msg": "Internal Server Error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(
+            {"success": False, "msg": "Internal Server Error"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+
+
 
 from rest_framework_simplejwt.tokens import RefreshToken
 

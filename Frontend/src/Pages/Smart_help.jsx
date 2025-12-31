@@ -17,7 +17,7 @@ const Smart_help = () => {
         setLoading(true);
 
         try {
-            const res = await fetch(`${API_BASE_URL}/smart_help/`, {
+            const res = await fetch(`${API_BASE_URL}/smart-help/`, {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${accessToken}`,
@@ -25,9 +25,10 @@ const Smart_help = () => {
                 },
                 body: JSON.stringify({
                     know: selected,
-                    Workoutlevel: WorkoutLevel,
+                    workout_level: WorkoutLevel,
                     bmi: BMI,
                 })
+
             });
 
             const contentType = res.headers.get("content-type");
@@ -116,7 +117,7 @@ const Smart_help = () => {
                     </button>
                 </div>
 
-           
+
                 <div className="sh-results-container">
                     {WorkoutData?.data && Array.isArray(WorkoutData.data) && (
                         <div className="sh-result-grid fade-up">
@@ -160,4 +161,4 @@ const Smart_help = () => {
     );
 };
 
-export default Smart_help; 
+export default Smart_help;
